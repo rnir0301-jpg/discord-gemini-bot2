@@ -9,7 +9,7 @@ app = Flask('')
 
 @app.route('/')
 def home():
-    return "Bot is running!"
+    return "Bot is active!"
 
 def run_web():
     port = int(os.environ.get("PORT", 10000))
@@ -20,8 +20,8 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = discord.Client(intents=intents)
 
-# Gemini APIクライアントの初期化
-ai_client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+# Gemini APIクライアント初期化
+ai_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 @bot.event
 async def on_ready():
@@ -32,29 +32,21 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    # BotへのメンションまたはDMに反応
     if bot.user.mentioned_in(message) or isinstance(message.channel, discord.DMChannel):
         clean_text = message.content.replace(f"<@{bot.user.id}>", "").strip()
         
         async with message.channel.typing():
             try:
-                # モデル名を gemini-2.5-flash に指定
-# 変更前
-# res = ai_client.models.generate_content(
-#     model="gemini-2.5-flash",
-#     contents=clean_text
-# )
-
-# 変更後（gemini-1.5-flash に変更）
-res = ai_client.models.generate_content(
-    model="gemini-1.5-flash",
-    contents=clean_text
-)
-                await message.channel.send(res.text)
+                # 無料枠で確実に動作する gemini-1.5-flash を指定
+                response = ai_client.models.generate_content(
+                    model="gemini-1.5-flash",
+                    contents=clean_text,
+                )
+                await message.channel.send(response.text)
             except Exception as e:
                 await message.channel.send(f"エラーが発生しました: {e}")
                 print(e)
 
 if __name__ == "__main__":
     Thread(target=run_web).start()
-    bot.run(os.environ.get("DISCORD_TOKEN"))
+    bot.run(os.getenv("DISCORD_TOKEN"))
