@@ -39,10 +39,17 @@ async def on_message(message):
         async with message.channel.typing():
             try:
                 # モデル名を gemini-2.5-flash に指定
-                res = ai_client.models.generate_content(
-                    model="gemini-2.5-flash",
-                    contents=clean_text
-                )
+# 変更前
+# res = ai_client.models.generate_content(
+#     model="gemini-2.5-flash",
+#     contents=clean_text
+# )
+
+# 変更後（gemini-1.5-flash に変更）
+res = ai_client.models.generate_content(
+    model="gemini-1.5-flash",
+    contents=clean_text
+)
                 await message.channel.send(res.text)
             except Exception as e:
                 await message.channel.send(f"エラーが発生しました: {e}")
