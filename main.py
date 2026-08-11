@@ -33,9 +33,9 @@ async def on_message(message):
         clean_text = message.content.replace(f"<@{bot.user.id}>", "").strip()
         
         try:
-            # AI Studioのダッシュボードで有効なモデル名に変更
+            # 動作確認が取れたモデル名を指定
             res = ai_client.models.generate_content(
-                model="gemini-2.5-flash",
+                model="gemini-3.5-flash-lite",
                 contents=clean_text
             )
             await message.channel.send(res.text)
