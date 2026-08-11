@@ -36,8 +36,9 @@ async def on_message(message):
         clean_text = message.content.replace(f"<@{bot.user.id}>", "").strip()
         
         try:
+            # 正しいモデル名を指定
             res = ai_client.models.generate_content(
-                model="gemini-2.5-flash",
+                model="gemini-2.0-flash",
                 contents=clean_text
             )
             await message.channel.send(res.text)
