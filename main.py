@@ -2,7 +2,7 @@ import os
 from threading import Thread
 from flask import Flask
 import discord
-import google.generativeai as genai
+from google import genai
 
 # Renderスリープ防止用Webサーバー
 app = Flask('')
@@ -21,8 +21,7 @@ intents.message_content = True
 bot = discord.Client(intents=intents)
 
 # Gemini API設定
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel("gemini-1.5-flash")
+ai_client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
 @bot.event
 async def on_ready():
@@ -38,12 +37,16 @@ async def on_message(message):
         
         async with message.channel.typing():
             try:
-                response = model.generate_content(clean_text)
-                await message.channel.send(response.text)
+                # 最新の gemini-2.5-flash モデルを指定
+                res = ai_client.models.generate_content(
+                    model="gemini-2.5-flash",
+                    contents=clean_text
+                )
+                await message.channel.send(res.text)
             except Exception as e:
                 await message.channel.send(f"エラーが発生しました: {e}")
                 print(e)
 
 if __name__ == "__main__":
     Thread(target=run_web).start()
-    bot.run(os.getenv("DISCORD_TOKEN"))
+    bot.run(os.environ.get("DISCORD_TOKEN"))
