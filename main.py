@@ -35,17 +35,15 @@ async def on_message(message):
     if bot.user.mentioned_in(message) or isinstance(message.channel, discord.DMChannel):
         clean_text = message.content.replace(f"<@{bot.user.id}>", "").strip()
         
-        async with message.channel.typing():
-            try:
-                # 最新の gemini-2.5-flash モデルを指定
-                res = ai_client.models.generate_content(
-                    model="gemini-2.5-flash",
-                    contents=clean_text
-                )
-                await message.channel.send(res.text)
-            except Exception as e:
-                await message.channel.send(f"エラーが発生しました: {e}")
-                print(e)
+        try:
+            res = ai_client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=clean_text
+            )
+            await message.channel.send(res.text)
+        except Exception as e:
+            await message.channel.send(f"エラーが発生しました: {e}")
+            print(e)
 
 if __name__ == "__main__":
     Thread(target=run_web).start()
