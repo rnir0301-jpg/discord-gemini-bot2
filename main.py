@@ -4,7 +4,6 @@ from flask import Flask
 import discord
 from google import genai
 
-# Renderスリープ防止用Webサーバー
 app = Flask('')
 
 @app.route('/')
@@ -15,12 +14,10 @@ def run_web():
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
 
-# Discord Bot設定
 intents = discord.Intents.default()
 intents.message_content = True
 bot = discord.Client(intents=intents)
 
-# Gemini API設定
 ai_client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
 @bot.event
@@ -36,9 +33,9 @@ async def on_message(message):
         clean_text = message.content.replace(f"<@{bot.user.id}>", "").strip()
         
         try:
-            # 正しいモデル名を指定
+            # AI Studioのダッシュボードで有効なモデル名に変更
             res = ai_client.models.generate_content(
-                model="gemini-2.0-flash",
+                model="gemini-2.5-flash",
                 contents=clean_text
             )
             await message.channel.send(res.text)
